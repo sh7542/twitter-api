@@ -63,3 +63,23 @@ class TestTweetViews(TestCase):
         self.client.delete("/tweets/1")
         self.assertIsNone(db.session.query(Tweet).get(1))
         self.tearDown()
+
+    def test_all_tweet_show(self):
+        self.setUp()
+        first_tweet = Tweet()
+        first_tweet.text = "First tweet"
+        db.session.add(first_tweet)
+        second_tweet = Tweet()
+        second_tweet.text = "Second tweet"
+        db.session.add(second_tweet)
+        db.session.commit()
+        response = self.client.get("/tweets")
+        response_tweet = response.json
+
+        self.assertEqual(response_tweet[0]["id"], 1)
+        self.assertEqual(response_tweet[0]["text"], "First tweet")
+        self.assertIsNotNone(response_tweet[0]["created_at"])
+        self.assertEqual(response_tweet[1]["id"], 2)
+        self.assertEqual(response_tweet[1]["text"], "Second tweet")
+        self.assertIsNotNone(response_tweet[1]["created_at"])
+        self.tearDown()
